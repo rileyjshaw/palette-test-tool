@@ -1,5 +1,6 @@
 {
   "name": "palette-test-tool",
+  "homepage": "https://rileyjshaw.com/palette-test-tool",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
