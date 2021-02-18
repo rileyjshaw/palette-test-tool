@@ -1,0 +1,6 @@
+{
+  "short_name": "Palette tool",
+  "name": "RGBCMY color palette generation tool",
+  "start_url": ".",
+  "display": "standalone"
+}
