@@ -95,10 +95,10 @@ input[type='range']:focus::-moz-range-thumb {
 	border: 2px solid currentColor;
 	transition: background 0.3s ease-in-out;
 }
-.color-list.old primary button:hover {
+.color-list.old .primary button:hover {
 	background: rgba(255, 255, 255, 0.8);
 }
-.dark .color-list.old button:hover {
+.dark .color-list.old .primary button:hover {
 	background: rgba(0, 0, 0, 0.8);
 }
 .color-list.bw {

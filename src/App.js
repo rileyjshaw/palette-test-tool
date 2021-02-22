@@ -138,7 +138,7 @@ function App() {
 		});
 		return acc;
 	});
-	const [activeColor, setActiveColor] = useState(false);
+	const [activeColor, setActiveColor] = useState(null);
 	const [mixMethodIndices, setMixMethodIndices] = useState({CMY: 0, RGB: 0});
 	const [showSecondaryColors, setShowSecondaryColors] = useState(true);
 	const colors = useMemo(
@@ -207,7 +207,10 @@ function App() {
 						Mix mode: {mixMethods[colorSpace][mixMethodIndices[colorSpace]].name}
 					</button>
 					<div />
-					<button tabIndex="-1" onClick={() => setDarkMode(toggle)}>
+					<button tabIndex="-1" onClick={() => {
+						setActiveColor(null);
+						setDarkMode(toggle);
+					}}>
 						Dark mode: {darkMode ? 'on' : 'off'}
 					</button>
 					<div />
