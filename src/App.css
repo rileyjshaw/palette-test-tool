@@ -159,3 +159,27 @@ input[type='range']:focus::-moz-range-thumb {
 .dark .color-list.bw .hex {
 	background: #000;
 }
+.tri-intersection {
+	position: absolute;
+	right: 26.660254038px;
+	top: 11.4px;
+}
+.tri-intersection .p1,
+.tri-intersection .p2,
+.tri-intersection .p3 {
+	border-radius: 50%;
+	height: 36px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 36px;
+}
+.tri-intersection .p1 {
+	transform: translate(0, -10px);
+}
+.tri-intersection .p2 {
+	transform: translate(-8.660254038px, 5px);
+}
+.tri-intersection .p3 {
+	transform: translate(8.660254038px, 5px);
+}

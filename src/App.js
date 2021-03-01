@@ -35,10 +35,9 @@ function getShoulders(primary) {
 	}[primary];
 }
 
-function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
-	const [mixMethod, secondaryColors, fullMixColor] = {
+function getNewSecondaryColors(primary1, palette, mixMethod) {
+	const [secondaryColors, fullMixColor] = {
 		C: [
-			mixMethods.CMY[mixMethodIndices.CMY].method,
 			[
 				['M', 'B'],
 				['Y', 'G'],
@@ -46,7 +45,6 @@ function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
 			[['M', 'Y'], 'K'],
 		],
 		M: [
-			mixMethods.CMY[mixMethodIndices.CMY].method,
 			[
 				['C', 'B'],
 				['Y', 'R'],
@@ -54,7 +52,6 @@ function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
 			[['C', 'Y'], 'K'],
 		],
 		Y: [
-			mixMethods.CMY[mixMethodIndices.CMY].method,
 			[
 				['C', 'G'],
 				['M', 'R'],
@@ -62,7 +59,6 @@ function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
 			[['C', 'M'], 'K'],
 		],
 		R: [
-			mixMethods.RGB[mixMethodIndices.RGB].method,
 			[
 				['G', 'Y'],
 				['B', 'M'],
@@ -70,7 +66,6 @@ function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
 			[['G', 'B'], 'W'],
 		],
 		G: [
-			mixMethods.RGB[mixMethodIndices.RGB].method,
 			[
 				['R', 'Y'],
 				['B', 'C'],
@@ -78,7 +73,6 @@ function getNewSecondaryColors(primary1, palette, mixMethodIndices) {
 			[['R', 'B'], 'W'],
 		],
 		B: [
-			mixMethods.RGB[mixMethodIndices.RGB].method,
 			[
 				['R', 'M'],
 				['G', 'C'],
@@ -117,6 +111,7 @@ const defaultPalettes = {
 };
 const colorOrder = 'RYGCBM'.split('');
 const fgColors = {CMY: 'K', RGB: 'W'};
+const colorSpaces = ['CMY', 'RGB']; // colorSpaces[+darkMode] === 'RGB'
 
 function App() {
 	const [darkMode, setDarkMode] = useState(false);
@@ -127,7 +122,7 @@ function App() {
 		const triplets = colorString.split(';').map(triplet => triplet.split(','));
 		if (triplets.length !== 14 || !triplets.every(triplet => triplet.length === 3)) return defaultPalettes;
 		const acc = {};
-		['CMY', 'RGB'].forEach((colorSpace, i) => {
+		colorSpaces.forEach((colorSpace, i) => {
 			acc[colorSpace] = {};
 
 			const offset = 7 * i;
@@ -147,7 +142,7 @@ function App() {
 	);
 	const colorsQueryString = useMemo(
 		() =>
-			`?colors=${['CMY', 'RGB']
+			`?colors=${colorSpaces
 				.flatMap(colorSpace =>
 					[...colorOrder, fgColors[colorSpace]].map(color => palettes[colorSpace][color].join())
 				)
@@ -156,7 +151,11 @@ function App() {
 	);
 
 	const hueRef = useRef(null);
-	const colorSpace = darkMode ? 'RGB' : 'CMY';
+	const colorSpace = colorSpaces[+darkMode];
+	const mixMethod = useMemo(() => mixMethods[colorSpace][mixMethodIndices[colorSpace]], [
+		colorSpace,
+		mixMethodIndices,
+	]);
 	const palette = palettes[colorSpace];
 
 	useEffect(() => {
@@ -164,7 +163,7 @@ function App() {
 			const newPalettes = {...oldPalettes};
 			const newPalette = {...newPalettes[colorSpace]};
 			const secondaryColors = [0, 1, 2].flatMap(i =>
-				getNewSecondaryColors(colorSpace[i], newPalette, mixMethodIndices)
+				getNewSecondaryColors(colorSpace[i], newPalette, mixMethod.method)
 			);
 			secondaryColors.forEach(([key, value]) => {
 				newPalette[key] = value;
@@ -172,7 +171,7 @@ function App() {
 			newPalettes[colorSpace] = newPalette;
 			return newPalettes;
 		});
-	}, [colorSpace, mixMethodIndices]);
+	}, [colorSpace, mixMethod]);
 
 	return (
 		<div
@@ -195,16 +194,15 @@ function App() {
 						tabIndex="-1"
 						onClick={() => {
 							setMixMethodIndices(indices => {
-								const key = darkMode ? 'RGB' : 'CMY';
-								const newIndex = (indices[key] + 1) % mixMethods[key].length;
+								const newIndex = (indices[colorSpace] + 1) % mixMethods[colorSpace].length;
 								return {
 									...indices,
-									[key]: newIndex,
+									[colorSpace]: newIndex,
 								};
 							});
 						}}
 					>
-						Mix mode: {mixMethods[colorSpace][mixMethodIndices[colorSpace]].name}
+						Mix mode: {mixMethod.name}
 					</button>
 					<div />
 					<button
@@ -223,7 +221,7 @@ function App() {
 							window.history.replaceState(null, null, colorsQueryString);
 							console.log(
 								JSON.stringify(
-									['CMY', 'RGB'].reduce((outerAcc, colorSpace) => {
+									colorSpaces.reduce((outerAcc, colorSpace) => {
 										outerAcc[colorSpace] = Object.entries(palettes[colorSpace]).reduce(
 											(acc, [color, values]) => {
 												const {r, g, b} = tinycolor(toHslString(values)).toRgb();
@@ -270,7 +268,7 @@ function App() {
 											const secondaryColors = getNewSecondaryColors(
 												activeColor,
 												newPalette,
-												mixMethodIndices
+												mixMethod.method
 											);
 											secondaryColors.forEach(([key, value]) => {
 												newPalette[key] = value;
@@ -283,7 +281,7 @@ function App() {
 							))}
 						</>
 					) : (
-						<p className="info">Click a primary color ({darkMode ? 'RGB' : 'CMY'}) to begin editing.</p>
+						<p className="info">Click a primary color ({colorSpace}) to begin editing.</p>
 					)}
 				</div>
 				<ul className="color-list bw">
@@ -322,7 +320,7 @@ function App() {
 										const secondaryColors = getNewSecondaryColors(
 											key,
 											newPalette,
-											mixMethodIndices
+											mixMethod.method
 										);
 										secondaryColors.forEach(([key, value]) => {
 											newPalette[key] = value;
@@ -346,7 +344,7 @@ function App() {
 											const secondaryColors = getNewSecondaryColors(
 												key,
 												newPalette,
-												mixMethodIndices
+												mixMethod.method
 											);
 											secondaryColors.forEach(([key, value]) => {
 												newPalette[key] = value;
@@ -394,7 +392,7 @@ function App() {
 											const secondaryColors = getNewSecondaryColors(
 												key,
 												newPalette,
-												mixMethodIndices
+												mixMethod.method
 											);
 											secondaryColors.forEach(([key, value]) => {
 												newPalette[key] = value;
@@ -412,6 +410,20 @@ function App() {
 						);
 					})}
 				</ul>
+				<div className="tri-intersection">
+					<div
+						className="p1"
+						style={{background: toHslString(palette[colorSpace[0]]), mixBlendMode: mixMethod.name}}
+					/>
+					<div
+						className="p2"
+						style={{background: toHslString(palette[colorSpace[1]]), mixBlendMode: mixMethod.name}}
+					/>
+					<div
+						className="p3"
+						style={{background: toHslString(palette[colorSpace[2]]), mixBlendMode: mixMethod.name}}
+					/>
+				</div>
 			</main>
 		</div>
 	);
