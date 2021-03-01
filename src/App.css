@@ -160,6 +160,7 @@ input[type='range']:focus::-moz-range-thumb {
 	background: #000;
 }
 .tri-intersection {
+	isolation: isolate;
 	position: absolute;
 	right: 26.660254038px;
 	top: 21.4px;
