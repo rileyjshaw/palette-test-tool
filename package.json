@@ -25,7 +25,7 @@
     "eject": "react-scripts eject",
     "lint": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "yarn predeploy && gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
