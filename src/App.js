@@ -207,10 +207,13 @@ function App() {
 						Mix mode: {mixMethods[colorSpace][mixMethodIndices[colorSpace]].name}
 					</button>
 					<div />
-					<button tabIndex="-1" onClick={() => {
-						setActiveColor(null);
-						setDarkMode(toggle);
-					}}>
+					<button
+						tabIndex="-1"
+						onClick={() => {
+							setActiveColor(null);
+							setDarkMode(toggle);
+						}}
+					>
 						Dark mode: {darkMode ? 'on' : 'off'}
 					</button>
 					<div />
@@ -283,6 +286,17 @@ function App() {
 						<p className="info">Click a primary color ({darkMode ? 'RGB' : 'CMY'}) to begin editing.</p>
 					)}
 				</div>
+				<ul className="color-list bw">
+					{darkMode ? (
+						<li className="color-item" style={{background: toHslString(palette.W)}}>
+							<span className="hex">{tinycolor(toHslString(palette.W)).toHexString()}</span>
+						</li>
+					) : (
+						<li className="color-item" style={{background: toHslString(palette.K)}}>
+							<span className="hex">{tinycolor(toHslString(palette.K)).toHexString()}</span>
+						</li>
+					)}
+				</ul>
 				<ul className="color-list new">
 					{colors.map((key, i) => {
 						const isPrimary = !(showSecondaryColors && darkMode === !!(i % 2));
@@ -397,17 +411,6 @@ function App() {
 							</li>
 						);
 					})}
-				</ul>
-				<ul className="color-list bw">
-					{darkMode ? (
-						<li className="color-item" style={{background: toHslString(palette.W)}}>
-							<span className="hex">{tinycolor(toHslString(palette.W)).toHexString()}</span>
-						</li>
-					) : (
-						<li className="color-item" style={{background: toHslString(palette.K)}}>
-							<span className="hex">{tinycolor(toHslString(palette.K)).toHexString()}</span>
-						</li>
-					)}
 				</ul>
 			</main>
 		</div>
